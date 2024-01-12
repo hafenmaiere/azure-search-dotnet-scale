@@ -21,7 +21,7 @@ namespace OptimizeDataIndexing
 
             // Define parameters for exponential backoff
             int attempts = 0;
-            TimeSpan delay = delay = TimeSpan.FromSeconds(2);
+            TimeSpan delay = TimeSpan.FromSeconds(2);
             int maxRetryAttempts = 5;
 
             // Implement exponential backoff
@@ -55,7 +55,7 @@ namespace OptimizeDataIndexing
                             batch = IndexDocumentsBatch.Upload(hotels);
 
                             Task.Delay(delay).Wait();
-                            delay = delay * 2;
+                            delay *= 2;
                             continue;
                         }
                     }
@@ -63,7 +63,7 @@ namespace OptimizeDataIndexing
                     
                     return result;
                 }
-                catch (RequestFailedException ex)
+                catch (RequestFailedException)
                 {
                     Console.WriteLine("[Batch starting at doc {0} failed]", id);
                     //Console.WriteLine("[Attempt: {0} of {1} Failed] - Error: {2} \n", attempts, maxRetryAttempts, ex.Message);
@@ -76,7 +76,7 @@ namespace OptimizeDataIndexing
                     }
 
                     Task.Delay(delay).Wait();
-                    delay = delay * 2;
+                    delay *= 2;
                 }
             } while (true);
 

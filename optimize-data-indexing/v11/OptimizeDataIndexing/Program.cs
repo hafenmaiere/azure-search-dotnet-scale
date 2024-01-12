@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +18,9 @@ namespace OptimizeDataIndexing
     {
         public static async Task Main(string[] args)
         {
-            IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile("appsettings.json");
+            IConfigurationBuilder builder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json");
+
             IConfigurationRoot configuration = builder.Build();
 
             string searchServiceUri = configuration["SearchServiceUri"];
@@ -127,18 +128,18 @@ namespace OptimizeDataIndexing
         // Returns size of object in MB
         public static double EstimateObjectSize(object data)
         {
-            // converting object to byte[] to determine the size of the data
-            BinaryFormatter bf = new BinaryFormatter();
-            MemoryStream ms = new MemoryStream();
-            byte[] Array;
+            // Converting object to byte[] to determine the size of the data
+            var ms = new MemoryStream();
+            var bw = new BinaryWriter(ms);
 
-            // converting data to json for more accurate sizing
+            // Converting data to json for more accurate sizing
             var json = JsonSerializer.Serialize(data);
-            bf.Serialize(ms, json);
-            Array = ms.ToArray();
+            
+            bw.Write(json);
+            var jsonBytes = ms.ToArray();
 
             // converting from bytes to megabytes
-            double sizeInMb = (double)Array.Length / 1000000;
+            double sizeInMb = (double)jsonBytes.Length / 1000000;
 
             return sizeInMb;
         }
